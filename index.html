@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      border: 2px solid #00ff00;
+      background-color: #111;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    const grid = 20;
+    const count = canvas.width / grid;
+
+    let snake = [{ x: 160, y: 160 }];
+    let dx = grid;
+    let dy = 0;
+    let food = randomPosition();
+    let gameOver = false;
+
+    function randomPosition() {
+      const x = Math.floor(Math.random() * count) * grid;
+      const y = Math.floor(Math.random() * count) * grid;
+      return { x, y };
+    }
+
+    function drawRect(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, grid - 1, grid - 1);
+    }
+
+    function loop() {
+      if (gameOver) return;
+
+      requestAnimationFrame(loop);
+
+      if (++frames < 5) return;
+      frames = 0;
+
+      // Mover cuerpo
+      const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+      // Fin del juego por colisión
+      if (
+        head.x < 0 || head.x >= canvas.width ||
+        head.y < 0 || head.y >= canvas.height ||
+        snake.some(s => s.x === head.x && s.y === head.y)
+      ) {
+        alert('¡Game Over!');
+        gameOver = true;
+        return;
+      }
+
+      snake.unshift(head);
+
+      // Comer comida
+      if (head.x === food.x && head.y === food.y) {
+        food = randomPosition();
+      } else {
+        snake.pop();
+      }
+
+      // Dibujar
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawRect(food.x, food.y, 'red');
+      snake.forEach((part, index) => {
+        drawRect(part.x, part.y, index === 0 ? '#0f0' : '#0a0');
+      });
+    }
+
+    // Movimiento con teclado
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft' && dx === 0) {
+        dx = -grid; dy = 0;
+      } else if (e.key === 'ArrowUp' && dy === 0) {
+        dx = 0; dy = -grid;
+      } else if (e.key === 'ArrowRight' && dx === 0) {
+        dx = grid; dy = 0;
+      } else if (e.key === 'ArrowDown' && dy === 0) {
+        dx = 0; dy = grid;
+      }
+    });
+
+    let frames = 0;
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
