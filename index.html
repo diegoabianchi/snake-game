@@ -12,31 +12,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: start;
-      height: 100vh;
       margin: 0;
     }
-
     h1 {
       margin-top: 20px;
       font-size: 2.5rem;
       color: #4caf50;
     }
-
     canvas {
       border: 3px solid #4caf50;
       background-color: #1e1e1e;
       margin-top: 10px;
     }
-
-    #scoreBoard {
-      display: flex;
-      justify-content: space-between;
-      width: 400px;
-      margin-top: 10px;
-      font-size: 1.2rem;
-    }
-
     #highScores {
       background: #222;
       border: 2px solid #4caf50;
@@ -44,39 +31,51 @@
       margin-top: 20px;
       width: 400px;
     }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #388e3c;
+    }
+    #gameContainer { display: none; }
   </style>
 </head>
 <body>
   <h1>Snake Pro</h1>
-  <div id="scoreBoard">
-    <div>Puntaje: <span id="score">0</span></div>
-    <div>Velocidad: <span id="speed">5</span></div>
+  <div id="menu">
+    <div id="highScores">
+      <h3>Top 5 Puntajes</h3>
+      <ol id="scoreList"></ol>
+    </div>
+    <button id="startBtn">Comenzar Juego</button>
   </div>
-  <canvas id="game" width="400" height="400"></canvas>
-  <div id="highScores">
-    <h3>Top 5 Puntajes</h3>
-    <ol id="scoreList"></ol>
+  <div id="gameContainer">
+    <div id="scoreBoard">
+      <div>Puntaje: <span id="score">0</span></div>
+      <div>Velocidad: <span id="speed">5</span></div>
+    </div>
+    <canvas id="game" width="400" height="400"></canvas>
   </div>
-
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score');
     const speedEl = document.getElementById('speed');
     const scoreList = document.getElementById('scoreList');
+    const startBtn = document.getElementById('startBtn');
+    const menu = document.getElementById('menu');
+    const gameContainer = document.getElementById('gameContainer');
 
     const box = 20;
     const canvasSize = 400;
-    let snake = [{ x: 200, y: 200 }];
-    let direction = 'RIGHT';
-    let food = spawnFood();
-    let score = 0;
-    let speed = 5;
-    let interval;
-    let changingDirection = false;
-
+    let snake, direction, food, score, speed, interval, changingDirection;
     const highScores = JSON.parse(localStorage.getItem('snakeHighScores')) || [];
-    updateHighScoreBoard();
 
     function spawnFood() {
       return {
@@ -140,7 +139,8 @@
           updateHighScoreBoard();
         }
         alert("Game Over!");
-        resetGame();
+        menu.style.display = 'block';
+        gameContainer.style.display = 'none';
         return;
       }
       changingDirection = false;
@@ -172,6 +172,7 @@
       speed = 5;
       scoreEl.textContent = score;
       speedEl.textContent = speed;
+      changingDirection = false;
       clearInterval(interval);
       interval = setInterval(gameLoop, 1000 / speed);
     }
@@ -187,7 +188,13 @@
       }
     });
 
-    resetGame();
+    startBtn.addEventListener('click', () => {
+      menu.style.display = 'none';
+      gameContainer.style.display = 'block';
+      resetGame();
+    });
+
+    updateHighScoreBoard();
   </script>
 </body>
 </html>
