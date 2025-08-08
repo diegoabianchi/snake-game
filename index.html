@@ -1,64 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Snake Game - Selector</title>
+  <meta charset="UTF-8">
+  <title>Snake Game - Clásico vs Pro</title>
   <style>
     * {
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
     }
     body {
       margin: 0;
-      background: #000;
-      color: white;
+      padding: 0;
+      background: linear-gradient(135deg, #1f1f1f, #121212);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
     }
     .screen {
       display: none;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      text-align: center;
     }
     .visible {
       display: flex;
     }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+
     button {
+      padding: 15px 40px;
       margin: 10px;
-      padding: 15px 30px;
       font-size: 18px;
       border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background: #1abc9c;
+      border-radius: 12px;
+      background: #00c9a7;
       color: white;
-      transition: background 0.3s;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 201, 167, 0.4);
+      transition: transform 0.2s ease, background 0.3s ease;
     }
+
     button:hover {
-      background: #16a085;
+      background: #00b295;
+      transform: scale(1.05);
     }
+
     canvas {
-      background: #111;
-      border: 3px solid #1abc9c;
       margin-top: 20px;
+      background-color: #1a1a1a;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00c9a7;
     }
+
     #score {
-      font-size: 20px;
+      font-size: 22px;
       margin-top: 10px;
+      padding: 10px 20px;
+      background: #222;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px #000;
+    }
+
+    #menu button {
+      width: 250px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Pantalla de selección -->
+  <!-- Menú de selección -->
   <div id="menu" class="screen visible">
-    <h1>Selecciona una versión</h1>
-    <button onclick="startClassic()">Versión Clásica 🐍</button>
-    <button onclick="startPro()">Versión Pro ✨</button>
+    <h1>🐍 Snake Game</h1>
+    <button onclick="startClassic()">Versión Clásica</button>
+    <button onclick="startPro()">Versión Pro</button>
   </div>
 
   <!-- Pantalla de juego -->
@@ -126,20 +146,28 @@
 
     function drawSnake() {
       snake.forEach((part, index) => {
-        ctx.fillStyle = index === 0 ? '#2ecc71' : '#27ae60';
+        const gradient = ctx.createRadialGradient(part.x + 10, part.y + 10, 4, part.x + 10, part.y + 10, 10);
+        gradient.addColorStop(0, index === 0 ? '#00f9c7' : '#00c9a7');
+        gradient.addColorStop(1, '#005d4d');
+        ctx.fillStyle = gradient;
         ctx.fillRect(part.x, part.y, 18, 18);
       });
     }
 
     function drawFood() {
-      ctx.fillStyle = 'red';
-      ctx.fillRect(food.x, food.y, 18, 18);
+      const g = ctx.createRadialGradient(food.x + 10, food.y + 10, 3, food.x + 10, food.y + 10, 10);
+      g.addColorStop(0, '#ff4b4b');
+      g.addColorStop(1, '#8b0000');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(food.x + 10, food.y + 10, 8, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function update() {
       const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-      // Colisión con bordes
+      // Colisión
       if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
           snake.some(s => s.x === head.x && s.y === head.y)) {
         gameOver();
@@ -185,12 +213,12 @@
     function gameOver() {
       clearInterval(interval);
       running = false;
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      ctx.font = '28px Arial';
+      ctx.fillStyle = '#fff';
+      ctx.font = '28px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('¡Game Over!', canvas.width / 2, canvas.height / 2);
+      ctx.fillText('💀 GAME OVER 💀', canvas.width / 2, canvas.height / 2);
     }
 
     function togglePause() {
